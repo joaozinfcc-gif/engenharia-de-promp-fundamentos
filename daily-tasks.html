@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Tarefas Diárias</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .date-display {
+            font-size: 1.2em;
+            color: #764ba2;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .stat-card h3 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #eee;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .tab-btn:hover {
+            color: #667eea;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .input-group input[type="text"],
+        .input-group input[type="time"] {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .input-group select {
+            min-width: 120px;
+        }
+
+        .input-group textarea {
+            width: 100%;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 0 1 auto;
+            min-width: 120px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+            padding: 8px 12px;
+            font-size: 0.9em;
+        }
+
+        .btn-danger:hover {
+            background: #ff5252;
+        }
+
+        .btn-success {
+            background: #51cf66;
+            color: white;
+            padding: 8px 12px;
+            font-size: 0.9em;
+        }
+
+        .btn-success:hover {
+            background: #40c057;
+        }
+
+        .task-item,
+        .event-item {
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover,
+        .event-item:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateX(5px);
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+            border-left-color: #51cf66;
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .task-content,
+        .event-content {
+            flex: 1;
+        }
+
+        .task-text,
+        .event-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .task-meta,
+        .event-meta {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .priority-high {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .priority-medium {
+            color: #ffa94d;
+            font-weight: bold;
+        }
+
+        .priority-low {
+            color: #51cf66;
+            font-weight: bold;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #eee;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .notes-container {
+            background: #fffbea;
+            border: 2px solid #ffd43b;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .input-group input[type="text"],
+            .input-group select {
+                width: 100%;
+            }
+
+            .task-item,
+            .event-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .task-actions {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 Meu Dia</h1>
+            <p>Gerenciador de tarefas e eventos diários</p>
+            <div class="date-display" id="dateDisplay"></div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3 id="totalTasks">0</h3>
+                <p>Tarefas Totais</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="completedTasks">0</h3>
+                <p>Tarefas Concluídas</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="pendingTasks">0</h3>
+                <p>Tarefas Pendentes</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalEvents">0</h3>
+                <p>Eventos Agendados</p>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('tasks')">📝 Tarefas</button>
+            <button class="tab-btn" onclick="switchTab('events')">🕐 Eventos</button>
+            <button class="tab-btn" onclick="switchTab('notes')">📖 Notas</button>
+        </div>
+
+        <!-- TAB: TAREFAS -->
+        <div id="tasks" class="tab-content active">
+            <div class="input-group">
+                <input type="text" id="taskInput" placeholder="Adicionar nova tarefa...">
+                <select id="prioritySelect">
+                    <option value="baixa">Baixa Prioridade</option>
+                    <option value="media" selected>Média Prioridade</option>
+                    <option value="alta">Alta Prioridade</option>
+                </select>
+                <button class="btn btn-primary" onclick="addTask()">Adicionar</button>
+            </div>
+
+            <div class="filter-group">
+                <button class="filter-btn active" onclick="filterTasks('todas')">Todas</button>
+                <button class="filter-btn" onclick="filterTasks('pendentes')">Pendentes</button>
+                <button class="filter-btn" onclick="filterTasks('concluidas')">Concluídas</button>
+            </div>
+
+            <div id="tasksList"></div>
+        </div>
+
+        <!-- TAB: EVENTOS -->
+        <div id="events" class="tab-content">
+            <div class="input-group">
+                <input type="text" id="eventInput" placeholder="Descrição do evento...">
+                <input type="time" id="eventTime">
+                <button class="btn btn-primary" onclick="addEvent()">Agendar</button>
+            </div>
+
+            <div id="eventsList"></div>
+        </div>
+
+        <!-- TAB: NOTAS -->
+        <div id="notes" class="tab-content">
+            <div class="notes-container">
+                <textarea id="notesInput" placeholder="Escreva suas notas do dia aqui..."></textarea>
+            </div>
+            <div style="text-align: center;">
+                <button class="btn btn-primary" onclick="saveNotes()">Salvar Notas</button>
+            </div>
+            <div id="notesDisplay" style="margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px; display: none;">
+                <h3>Notas do Dia:</h3>
+                <p id="notesText" style="margin-top: 10px; line-height: 1.6;"></p>
+            </div>
+        </div>
+
+        <!-- BOTÕES DE AÇÃO -->
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="exportData()">📥 Exportar Dados</button>
+            <button class="btn btn-danger" onclick="resetDay()">🔄 Resetar Dia</button>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'dailyTasks';
+        let currentFilter = 'todas';
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDateDisplay();
+            loadData();
+            renderTasks();
+            renderEvents();
+            renderNotes();
+            checkNewDay();
+        });
+
+        // Atualizar data
+        function updateDateDisplay() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date().toLocaleDateString('pt-BR', options);
+            document.getElementById('dateDisplay').textContent = today.charAt(0).toUpperCase() + today.slice(1);
+        }
+
+        // Verificar novo dia
+        function checkNewDay() {
+            const lastDate = localStorage.getItem('lastDate');
+            const today = new Date().toDateString();
+            
+            if (lastDate !== today) {
+                localStorage.setItem('lastDate', today);
+                resetDay();
+            }
+        }
+
+        // Carregar dados
+        function loadData() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            if (!data) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    tasks: [],
+                    events: [],
+                    notes: ''
+                }));
+            }
+        }
+
+        // Obter dados
+        function getData() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY));
+        }
+
+        // Salvar dados
+        function saveData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            updateStats();
+        }
+
+        // TAREFAS
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const priority = document.getElementById('prioritySelect').value;
+            
+            if (input.value.trim() === '') {
+                alert('Por favor, digite uma tarefa!');
+                return;
+            }
+
+            const data = getData();
+            data.tasks.push({
+                id: Date.now(),
+                text: input.value,
+                priority: priority,
+                completed: false,
+                date: new Date().toDateString()
+            });
+
+            saveData(data);
+            input.value = '';
+            document.getElementById('prioritySelect').value = 'media';
+            renderTasks();
+        }
+
+        function toggleTask(id) {
+            const data = getData();
+            const task = data.tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveData(data);
+                renderTasks();
+            }
+        }
+
+        function deleteTask(id) {
+            if (confirm('Tem certeza que deseja deletar esta tarefa?')) {
+                const data = getData();
+                data.tasks = data.tasks.filter(t => t.id !== id);
+                saveData(data);
+                renderTasks();
+            }
+        }
+
+        function filterTasks(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const data = getData();
+            const tasksList = document.getElementById('tasksList');
+            const tasks = data.tasks.filter(t => t.date === new Date().toDateString());
+            
+            let filtered = tasks;
+            if (currentFilter === 'pendentes') {
+                filtered = tasks.filter(t => !t.completed);
+            } else if (currentFilter === 'concluidas') {
+                filtered = tasks.filter(t => t.completed);
+            }
+
+            if (filtered.length === 0) {
+                tasksList.innerHTML = '<div class="empty-state"><p>Nenhuma tarefa para mostrar</p></div>';
+                return;
+            }
+
+            tasksList.innerHTML = filtered.map(task => `
+                <div class="task-item ${task.completed ? 'completed' : ''}">
+                    <div class="task-content">
+                        <div class="task-text">${escapeHtml(task.text)}</div>
+                        <div class="task-meta">
+                            Prioridade: <span class="priority-${task.priority}">${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn ${task.completed ? 'btn-secondary' : 'btn-success'}" onclick="toggleTask(${task.id})">
+                            ${task.completed ? '↩️ Desfazer' : '✓ Concluir'}
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteTask(${task.id})">🗑️ Deletar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // EVENTOS
+        function addEvent() {
+            const input = document.getElementById('eventInput');
+            const time = document.getElementById('eventTime');
+
+            if (input.value.trim() === '' || time.value === '') {
+                alert('Por favor, preencha a descrição e a hora!');
+                return;
+            }
+
+            const data = getData();
+            data.events.push({
+                id: Date.now(),
+                title: input.value,
+                time: time.value,
+                date: new Date().toDateString()
+            });
+
+            saveData(data);
+            input.value = '';
+            time.value = '';
+            renderEvents();
+        }
+
+        function deleteEvent(id) {
+            if (confirm('Tem certeza que deseja deletar este evento?')) {
+                const data = getData();
+                data.events = data.events.filter(e => e.id !== id);
+                saveData(data);
+                renderEvents();
+            }
+        }
+
+        function renderEvents() {
+            const data = getData();
+            const eventsList = document.getElementById('eventsList');
+            const events = data.events.filter(e => e.date === new Date().toDateString());
+            
+            events.sort((a, b) => a.time.localeCompare(b.time));
+
+            if (events.length === 0) {
+                eventsList.innerHTML = '<div class="empty-state"><p>Nenhum evento agendado</p></div>';
+                return;
+            }
+
+            eventsList.innerHTML = events.map(event => `
+                <div class="event-item">
+                    <div class="event-content">
+                        <div class="event-title">${escapeHtml(event.title)}</div>
+                        <div class="event-meta">🕐 ${event.time}</div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-danger" onclick="deleteEvent(${event.id})">🗑️ Deletar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // NOTAS
+        function saveNotes() {
+            const notesInput = document.getElementById('notesInput');
+            const data = getData();
+            data.notes = notesInput.value;
+            saveData(data);
+            renderNotes();
+            alert('Notas salvas com sucesso!');
+        }
+
+        function renderNotes() {
+            const data = getData();
+            const notesDisplay = document.getElementById('notesDisplay');
+            const notesText = document.getElementById('notesText');
+            const notesInput = document.getElementById('notesInput');
+
+            notesInput.value = data.notes;
+
+            if (data.notes.trim() !== '') {
+                notesDisplay.style.display = 'block';
+                notesText.textContent = data.notes;
+            } else {
+                notesDisplay.style.display = 'none';
+            }
+        }
+
+        // ABAS
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // ESTATÍSTICAS
+        function updateStats() {
+            const data = getData();
+            const tasks = data.tasks.filter(t => t.date === new Date().toDateString());
+            const completedTasks = tasks.filter(t => t.completed).length;
+
+            document.getElementById('totalTasks').textContent = tasks.length;
+            document.getElementById('completedTasks').textContent = completedTasks;
+            document.getElementById('pendingTasks').textContent = tasks.length - completedTasks;
+            document.getElementById('totalEvents').textContent = data.events.filter(e => e.date === new Date().toDateString()).length;
+        }
+
+        // EXPORTAR
+        function exportData() {
+            const data = getData();
+            const exportData = {
+                data: new Date().toDateString(),
+                tarefas: data.tasks.filter(t => t.date === new Date().toDateString()),
+                eventos: data.events.filter(e => e.date === new Date().toDateString()),
+                notas: data.notes
+            };
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `meu-dia-${new Date().toDateString()}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // RESETAR DIA
+        function resetDay() {
+            if (confirm('Tem certeza que deseja resetar o dia? As tarefas de hoje serão limpas.')) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    tasks: [],
+                    events: [],
+                    notes: ''
+                }));
+                renderTasks();
+                renderEvents();
+                renderNotes();
+                updateStats();
+            }
+        }
+
+        // ESCAPE HTML
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Atualizar estatísticas ao carregar
+        updateStats();
+    </script>
+</body>
+</html>
