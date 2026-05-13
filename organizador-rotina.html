@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizador de Rotina Diária</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="time"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="time"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .activity-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            background: #f5f5f5;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .activity-info {
+            flex-grow: 1;
+        }
+
+        .activity-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .activity-time {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .activity-category {
+            display: inline-block;
+            font-size: 0.75em;
+            padding: 3px 8px;
+            border-radius: 20px;
+            margin-left: 10px;
+        }
+
+        .category-rotina { background: #e3f2fd; color: #1976d2; }
+        .category-trabalho { background: #fff3e0; color: #f57c00; }
+        .category-estudo { background: #f3e5f5; color: #7b1fa2; }
+        .category-descanso { background: #e8f5e9; color: #388e3c; }
+        .category-outro { background: #fce4ec; color: #c2185b; }
+
+        .delete-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #ff5252;
+        }
+
+        .empty-message {
+            color: #999;
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .schedule-container {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .time-slot {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .time-label {
+            font-weight: 600;
+            color: #667eea;
+            min-width: 80px;
+            margin-right: 15px;
+        }
+
+        .time-content {
+            flex-grow: 1;
+            color: #333;
+        }
+
+        .free-time-highlight {
+            background: linear-gradient(90deg, #e8f5e9 0%, #c8e6c9 100%);
+            border: 2px solid #4caf50;
+        }
+
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .suggestion-category {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 5px solid #667eea;
+        }
+
+        .suggestion-category h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .suggestion-item {
+            background: white;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+
+        .suggestion-item:before {
+            content: "✓";
+            color: #4caf50;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .suggestions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .no-free-time {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📅 Organizador de Rotina Diária</h1>
+            <p class="subtitle">Organize seu dia, identifique tempo livre e descubra sugestões de atividades</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Card: Adicionar Atividade -->
+            <div class="card">
+                <h2>➕ Adicionar Atividade</h2>
+                <div class="form-group">
+                    <label for="activityName">Nome da Atividade:</label>
+                    <input type="text" id="activityName" placeholder="ex: Estudar matemática">
+                </div>
+                <div class="form-group">
+                    <label for="activityStart">Horário de Início:</label>
+                    <input type="time" id="activityStart">
+                </div>
+                <div class="form-group">
+                    <label for="activityEnd">Horário de Término:</label>
+                    <input type="time" id="activityEnd">
+                </div>
+                <div class="form-group">
+                    <label for="activityCategory">Categoria:</label>
+                    <select id="activityCategory">
+                        <option value="rotina">Rotina</option>
+                        <option value="trabalho">Trabalho</option>
+                        <option value="estudo">Estudo</option>
+                        <option value="descanso">Descanso</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
+                <button onclick="addActivity()">Adicionar Atividade</button>
+            </div>
+
+            <!-- Card: Estatísticas -->
+            <div class="card">
+                <h2>📊 Resumo do Dia</h2>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalActivities">0</div>
+                        <div class="stat-label">Atividades</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalFreeTime">0h</div>
+                        <div class="stat-label">Tempo Livre</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card: Minhas Atividades -->
+        <div class="card full-width">
+            <h2>📝 Minhas Atividades</h2>
+            <div id="activityList" class="activity-list">
+                <div class="empty-message">Nenhuma atividade adicionada ainda</div>
+            </div>
+        </div>
+
+        <!-- Card: Cronograma do Dia -->
+        <div class="card full-width">
+            <h2>⏱️ Cronograma do Dia</h2>
+            <div id="schedule" class="schedule-container">
+                <div class="empty-message">Adicione atividades para ver o cronograma</div>
+            </div>
+        </div>
+
+        <!-- Card: Horários Livres -->
+        <div class="card full-width">
+            <h2>🆓 Horários Livres</h2>
+            <div id="freeTime" class="schedule-container">
+                <div class="empty-message">Nenhum horário livre identificado</div>
+            </div>
+        </div>
+
+        <!-- Card: Sugestões de Atividades -->
+        <div class="card full-width">
+            <h2>💡 Sugestões para Tempo Livre</h2>
+            <div class="suggestions-grid">
+                <div class="suggestion-category">
+                    <h3>📚 Leitura</h3>
+                    <div class="suggestion-item">Ler um livro</div>
+                    <div class="suggestion-item">Ler artigos interessantes</div>
+                    <div class="suggestion-item">Ouvir audiolivro</div>
+                    <div class="suggestion-item">Ler blogs ou notícias</div>
+                </div>
+
+                <div class="suggestion-category">
+                    <h3>🔍 Pesquisa</h3>
+                    <div class="suggestion-item">Pesquisar um tópico interessante</div>
+                    <div class="suggestion-item">Fazer um curso online</div>
+                    <div class="suggestion-item">Assistir documentário</div>
+                    <div class="suggestion-item">Ouvir podcast educativo</div>
+                </div>
+
+                <div class="suggestion-category">
+                    <h3>📖 Revisar Matéria</h3>
+                    <div class="suggestion-item">Revisar anotações</div>
+                    <div class="suggestion-item">Fazer resumos</div>
+                    <div class="suggestion-item">Resolver exercícios</div>
+                    <div class="suggestion-item">Revisar conceitos-chave</div>
+                </div>
+
+                <div class="suggestion-category">
+                    <h3>🎵 Relaxar</h3>
+                    <div class="suggestion-item">Meditação ou yoga</div>
+                    <div class="suggestion-item">Ouvir música</div>
+                    <div class="suggestion-item">Caminhar</div>
+                    <div class="suggestion-item">Praticar hobby</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let activities = JSON.parse(localStorage.getItem('activities')) || [];
+
+        function saveActivities() {
+            localStorage.setItem('activities', JSON.stringify(activities));
+            updateDisplay();
+        }
+
+        function addActivity() {
+            const name = document.getElementById('activityName').value.trim();
+            const start = document.getElementById('activityStart').value;
+            const end = document.getElementById('activityEnd').value;
+            const category = document.getElementById('activityCategory').value;
+
+            if (!name || !start || !end) {
+                alert('Por favor, preencha todos os campos');
+                return;
+            }
+
+            if (start >= end) {
+                alert('O horário de término deve ser depois do início');
+                return;
+            }
+
+            activities.push({ name, start, end, category });
+            activities.sort((a, b) => a.start.localeCompare(b.start));
+
+            document.getElementById('activityName').value = '';
+            document.getElementById('activityStart').value = '';
+            document.getElementById('activityEnd').value = '';
+
+            saveActivities();
+        }
+
+        function deleteActivity(index) {
+            activities.splice(index, 1);
+            saveActivities();
+        }
+
+        function timeToMinutes(time) {
+            const [hours, minutes] = time.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        function minutesToTime(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+        }
+
+        function calculateFreeTime() {
+            if (activities.length === 0) return [];
+
+            const freeSlots = [];
+            const dayStart = 0; // 00:00
+            const dayEnd = 24 * 60; // 24:00
+
+            let currentTime = dayStart;
+
+            for (let activity of activities) {
+                const actStart = timeToMinutes(activity.start);
+                const actEnd = timeToMinutes(activity.end);
+
+                if (currentTime < actStart) {
+                    const duration = actStart - currentTime;
+                    if (duration >= 15) { // Apenas slots com 15+ minutos
+                        freeSlots.push({
+                            start: minutesToTime(currentTime),
+                            end: minutesToTime(actStart),
+                            duration: duration
+                        });
+                    }
+                }
+
+                currentTime = Math.max(currentTime, actEnd);
+            }
+
+            // Adicionar tempo livre até fim do dia
+            if (currentTime < dayEnd) {
+                const duration = dayEnd - currentTime;
+                if (duration >= 15) {
+                    freeSlots.push({
+                        start: minutesToTime(currentTime),
+                        end: minutesToTime(dayEnd),
+                        duration: duration
+                    });
+                }
+            }
+
+            return freeSlots;
+        }
+
+        function formatDuration(minutes) {
+            if (minutes < 60) {
+                return `${minutes} min`;
+            }
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`;
+        }
+
+        function updateDisplay() {
+            // Atualizar lista de atividades
+            const listContainer = document.getElementById('activityList');
+            if (activities.length === 0) {
+                listContainer.innerHTML = '<div class="empty-message">Nenhuma atividade adicionada ainda</div>';
+            } else {
+                listContainer.innerHTML = activities.map((act, idx) => `
+                    <div class="activity-item">
+                        <div class="activity-info">
+                            <div class="activity-name">${act.name}</div>
+                            <div class="activity-time">${act.start} - ${act.end}</div>
+                        </div>
+                        <span class="activity-category category-${act.category}">${act.category}</span>
+                        <button class="delete-btn" onclick="deleteActivity(${idx})">Deletar</button>
+                    </div>
+                `).join('');
+            }
+
+            // Atualizar cronograma
+            const scheduleContainer = document.getElementById('schedule');
+            if (activities.length === 0) {
+                scheduleContainer.innerHTML = '<div class="empty-message">Adicione atividades para ver o cronograma</div>';
+            } else {
+                scheduleContainer.innerHTML = activities.map(act => `
+                    <div class="time-slot">
+                        <div class="time-label">${act.start} - ${act.end}</div>
+                        <div class="time-content">
+                            <strong>${act.name}</strong>
+                            <span class="activity-category category-${act.category}">${act.category}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Atualizar horários livres
+            const freeSlots = calculateFreeTime();
+            const freeTimeContainer = document.getElementById('freeTime');
+            
+            if (freeSlots.length === 0) {
+                freeTimeContainer.innerHTML = '<div class="no-free-time">⏰ Você tem um dia bem cheio! Nenhum horário livre identificado.</div>';
+            } else {
+                freeTimeContainer.innerHTML = freeSlots.map(slot => `
+                    <div class="time-slot free-time-highlight">
+                        <div class="time-label">${slot.start} - ${slot.end}</div>
+                        <div class="time-content">
+                            Tempo livre: <strong>${formatDuration(slot.duration)}</strong>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Atualizar estatísticas
+            document.getElementById('totalActivities').textContent = activities.length;
+            const totalFreeMinutes = freeSlots.reduce((sum, slot) => sum + slot.duration, 0);
+            document.getElementById('totalFreeTime').textContent = formatDuration(totalFreeMinutes);
+        }
+
+        // Inicializar
+        updateDisplay();
+
+        // Permitir adicionar atividade com Enter
+        document.getElementById('activityEnd').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addActivity();
+            }
+        });
+    </script>
+</body>
+</html>
