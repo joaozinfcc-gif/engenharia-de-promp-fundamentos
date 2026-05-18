@@ -33,7 +33,6 @@ O usuário pode cadastrar atividades informando nome, horário e categoria. As t
 
 Na aba “Tempo Livre”, o sistema oferece sugestões de atividades como leitura, meditação, caminhada e estudo rápido, permitindo adicioná-las diretamente à agenda.
 
-> Os prints das telas e arquivos do protótipo devem ser colocados na pasta `/docs`.
 
 ---
 
