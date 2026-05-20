@@ -114,12 +114,3 @@ integrantes:João Pedro Fonseca , adryan da silva Ferreira , Lucas Kelvin Gomes 
 **Professor(a):** Kadidja Valéria  
 
 ---
-
-## 🚀 Próximos Passos
-
-- Implementar login de usuários
-- Criar sincronização em nuvem
-- Adicionar notificações e lembretes
-- Melhorar os gráficos de produtividade
-- Integrar inteligência artificial para sugestões personalizadas
-- Transformar o protótipo em aplicativo mobile
