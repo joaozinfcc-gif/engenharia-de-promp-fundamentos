@@ -103,14 +103,3 @@ integrantes:João Pedro Fonseca , Adryan da silva Ferreira , Lucas Kelvin Gomes 
 
 ---
 
-## 📝 Registro da Aula
-
-**Data:** 11/05/2026  
-
-**Atividade:** Discussão crítica + mini-projeto de aplicação  
-
-**Local:** Laboratório de informática / Quadro branco  
-
-**Professor(a):** Kadidja Valéria  
-
----
