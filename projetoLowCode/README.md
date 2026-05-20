@@ -99,7 +99,13 @@ O grupo organizou as atividades dividindo as responsabilidades entre os integran
 
 A comunicação ocorreu durante as aulas e através de ferramentas online para compartilhamento do código e ideias.
 
-integrantes:João Pedro Fonseca , Adryan da silva Ferreira , Lucas Kelvin Gomes Da Paz.
+integrantes:
+
+João Pedro Fonseca Barros: https://github.com/joaozinfcc-gif  
+
+Adryan da silva Ferreira: https://github.com/Adryan510 
+
+Lucas Kelvin Gomes Da Paz: https://github.com/Lucasgomesbit
 
 ---
 
