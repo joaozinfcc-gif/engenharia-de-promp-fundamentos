@@ -99,6 +99,8 @@ O grupo organizou as atividades dividindo as responsabilidades entre os integran
 
 A comunicação ocorreu durante as aulas e através de ferramentas online para compartilhamento do código e ideias.
 
+integrantes:João Pedro Fonseca , adryan da silva Ferreira , Lucas Kelvin Gomes Da
+
 ---
 
 ## 📝 Registro da Aula
