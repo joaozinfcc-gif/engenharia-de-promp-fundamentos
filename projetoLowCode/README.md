@@ -15,8 +15,9 @@ O sistema permite:
 ---
 
 ## 🖥️ Protótipo
+Link:
+https://gemini.google.com/share/39c5a4c9baf4
 
-O protótipo foi desenvolvido em HTML, CSS e JavaScript com foco em experiência do usuário e interface moderna.
 
 ### Funcionalidades principais
 
